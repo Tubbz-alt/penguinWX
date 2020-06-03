@@ -2,10 +2,7 @@ import React from 'react';
 import { HashRouter, Switch, Route } from 'react-router-dom';
 
 import Shell from './components/Shell';
-
 import pages from './pages';
-
-import './App.css';
 
 function App() {
 	return (
@@ -14,7 +11,7 @@ function App() {
 				<Switch>
 					{pages.map(page => (
 						<Route exact={page.exact} path={page.path}>
-							{page.component}
+							<page.component />
 						</Route>
 					))}
 				</Switch>

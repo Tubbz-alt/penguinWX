@@ -4,6 +4,7 @@
   "description": "An SDR based weather satellite station",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/PenguinSnail/penguinWX/issues"
   },
-  "homepage": "https://github.com/PenguinSnail/penguinWX#readme"
+  "homepage": "https://github.com/PenguinSnail/penguinWX#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "sqlite3": "^4.2.0"
+  }
 }

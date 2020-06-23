@@ -1,10 +1,15 @@
 const express = require('express');
 const apiRoutes = require('./src/api');
 
+// port to listen on
 const port = 8080;
 
 // initialize the db if it's not ready yet
-const db = require('./src/database');
+require('./src/utils/database');
+
+// update the tle database
+const tle = require('./src/utils/tle');
+tle.updateTLEs();
 
 // express server
 const app = express();

@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
-const db = require('../database');
+const authUtils = require('../utils/auth');
 
 module.exports.isAuthed = (req, res, next) => {
 	// read the given token from headers
 	const authJwt = req.header('auth-jwt');
 
 	// get our salt and hash from the database
-	db.getAuth().then(auth => {
+	authUtils.getAuth().then(auth => {
 		// if no salt/hash is defined
 		if (!auth) {
 			// automatically allow

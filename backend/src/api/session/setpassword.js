@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-const db = require('../../database');
+const authUtils = require('../../utils/auth');
 const authMiddleware = require('../../middleware/auth');
 
 router.post('/', authMiddleware.isAuthed, (req, res) => {
 	if (req.body) {
 		if (req.body.password && typeof req.body.password === 'string') {
-			db.setAuth(req.body.password).then(({ token }) => {
+			authUtils.setAuth(req.body.password).then(({ token }) => {
 				res.status(200).send(token);
 			}, e => {
 				console.error('ERROR storing new authentication: ', e);

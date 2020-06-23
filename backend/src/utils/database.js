@@ -1,6 +1,4 @@
 const sqlite3 = require('sqlite3').verbose();
-const jwt = require('jsonwebtoken');
-const salthash = require('./utils/salthash');
 
 const dbPath = './db.sqlite';
 const db = new sqlite3.Database(dbPath, e => {
@@ -15,14 +13,43 @@ const db = new sqlite3.Database(dbPath, e => {
 // initialize the database
 db.serialize(() => {
 	db.run("\
+		CREATE TABLE IF NOT EXISTS tle (\
+			satellite TEXT PRIMARY KEY,\
+			line_1 TEXT NOT NULL,\
+			line_2 TEXT NOT NULL\
+		)\
+	", e => {
+		if (e) {
+			console.error('ERROR creating `tle` table: ', e);
+			throw e;
+		}
+	});
+	// satellites table
+	// stores satellite data
+	// frequency, bandwidth, etc
+	db.run("\
+		CREATE TABLE IF NOT EXISTS satellites (\
+			satellite TEXT NOT NULL,\
+			frequency INT NOT NULL,\
+			sample_rate INT NOT NULL,\
+			gain INT NOT NULL,\
+			decode_method TEXT NOT NULL\
+		)\
+	", e => {
+		if (e) {
+			console.error('ERROR creating `satellites` table: ', e);
+			throw e;
+		}
+	});
+	// pass table
+	// data about individual satellite passes and recoridng info
+	db.run("\
 		CREATE TABLE IF NOT EXISTS passes (\
 			satellite TEXT NOT NULL,\
 			start_date DATETIME NOT NULL,\
 			duration INT NOT NULL,\
 			end_date DATETIME NOT NULL,\
-			frequency INT NOT NULL,\
-			sample_rate INT NOT NULL,\
-			gain INT NOT NULL\
+			status TEXT\
 		)\
 	", e => {
 		if (e) {
@@ -30,6 +57,9 @@ db.serialize(() => {
 			throw e;
 		}
 	});
+	// auth table
+	// holds salt and hash
+	// only ever has one row
 	db.run("\
 		CREATE TABLE IF NOT EXISTS auth (\
 			salt TEXT NOT NULL,\
@@ -39,58 +69,6 @@ db.serialize(() => {
 		if (e) {
 			console.error('ERROR creating `auth` table: ', e);
 			throw e;
-		}
-	});
-});
-
-/**
- * Salt and hash a password and store it in the database
- * @param {string} password the password to salt and hash
- */
-module.exports.setAuth = (password) => new Promise((resolve, reject) => {
-	const { salt, hash } = salthash.generateSaltHash(password);
-
-	db.run("\
-		INSERT or REPLACE INTO auth (rowid, salt, hash)\
-		VALUES (1, $salt, $hash)\
-	", {
-		$salt: salt,
-		$hash: hash,
-	}, e => {
-		if (e) {
-			console.error('ERROR INSERTing auth salt/hash in `auth` table: ', e);
-			reject(e);
-		} else {
-			jwt.sign('valid', salt, {}, (err, token) => {
-				resolve({
-					salt: salt,
-					hash: hash,
-					token: token,
-				});
-			});
-		}
-	});
-});
-/**
- * Get the stored salt and hash from the database
- */
-module.exports.getAuth = () => new Promise((resolve, reject) => {
-	db.get("SELECT * FROM auth WHERE rowid = 1", (e, row) => {
-		if (e) {
-			console.error('ERROR getting auth data row: ', e);
-			reject(e);
-		} else {
-			if (row) {
-				jwt.sign('valid', row.salt, {}, (err, token) => {
-					resolve({
-						salt: row.salt,
-						hash: row.hash,
-						token: token,
-					});
-				});
-			} else {
-				resolve(null);
-			}
 		}
 	});
 });

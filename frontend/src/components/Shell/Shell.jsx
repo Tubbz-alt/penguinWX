@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
 
 	menuButton: {
 		marginRight: theme.spacing(0.5),
-		[theme.breakpoints.up('sm')]: {
+		[theme.breakpoints.up('md')]: {
 			display: 'none',
 		},
 	},
@@ -90,7 +90,7 @@ function Shell(props) {
 				</Toolbar>
 			</AppBar>
 			{/* mobile drawer - has open/close handlers */}
-			<Hidden smUp implementation="css">
+			<Hidden mdUp implementation="css">
 				<Drawer
 					variant="temporary"
 					anchor="left"
@@ -107,7 +107,7 @@ function Shell(props) {
 				</Drawer>
 			</Hidden>
 			{/* desktop drawer - permanent */}
-			<Hidden xsDown implementation="css">
+			<Hidden smDown implementation="css">
 				<Drawer
 					className={classes.drawer}
 					classes={{

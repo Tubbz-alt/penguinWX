@@ -10,7 +10,7 @@ function App() {
 			<Shell pages={pages}>
 				<Switch>
 					{pages.map(page => (
-						<Route exact={page.exact} path={page.path}>
+						<Route key={page.path} exact={page.exact} path={page.path}>
 							<page.component />
 						</Route>
 					))}

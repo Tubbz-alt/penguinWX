@@ -1,21 +1,40 @@
 const express = require('express');
 const apiRoutes = require('./src/api');
 
+const logger = require('./src/utils/logger');
+require('colors');
+
 // port to listen on
 const port = 8080;
 
 // initialize the db if it's not ready yet
 require('./src/utils/database');
 
-// update the tle database
-const tle = require('./src/utils/tle');
-tle.updateTLEs();
+require('./src/utils/ground.js').setGround(0,0,0);
+require('./src/utils/satellites').addSatellite('NOAA 18', 137912500, 55000, 40, 'noaa', 19);
+require('./src/utils/satellites').addSatellite('NOAA 15', 137620000, 55000, 40, 'noaa', 19);
+require('./src/utils/satellites').addSatellite('NOAA 19', 137100000, 55000, 40, 'noaa', 19);
+require('./src/utils/satellites').addSatellite('METEOR-M 2', 137100000, 150000, 50, 'meteor', 19);
 
-// express server
+// start up the express server
 const app = express();
 // JSON parsing middleware
 app.use(express.json());
 // api route handlers
 app.use('/api', apiRoutes);
+app.use('/', express.static('../frontend/build'));
 // start listening
-app.listen(port, () => console.log(`Listening on http://localhost:${port}`));
+app.listen(port, () => logger.log('Main', 'Listening on ' + `http://localhost:${port}`.green));
+
+require('./src/utils/tle')
+	.updateTLEs()
+	.then(
+		() => {
+			logger.log('TLE', 'Updated TLE database');
+			require('./src/loop')();
+		},
+		e => {
+			logger.error('TLE', 'Error updating TLEs: ', e);
+			require('./src/loop')();
+		}
+	);

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Paper, TableContainer, Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core';
+import { Paper, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 const secondsToDuration = _seconds => {
 	const totalSeconds = Math.round(_seconds);
@@ -10,12 +11,23 @@ const secondsToDuration = _seconds => {
 	return min + ':' + (sec < 10 ? '0' : '') + sec;
 };
 
+const useStyles = makeStyles(theme => ({
+	centerPadded: {
+		display: 'flex',
+		width: '100%',
+		margin: '10px 0px',
+		justifyContent: 'center',
+		textAlign: 'center'
+	}
+}));
+
 function PassTable(props) {
 	const { rows } = props;
+	const classes = useStyles();
 
 	return (
 		<TableContainer component={Paper}>
-			<Table aria-label="simple table">
+			<Table aria-label="passes table">
 				<TableHead>
 					<TableRow>
 						<TableCell>Satellite</TableCell>
@@ -26,19 +38,22 @@ function PassTable(props) {
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{rows && rows.map((row) => (
-						<TableRow key={row.date}>
-							<TableCell component="th" scope="row">
-								{row.satellite}
-							</TableCell>
-							<TableCell align="right">{row.date.toLocaleString()}</TableCell>
-							<TableCell align="right">{secondsToDuration(row.duration)}</TableCell>
-							<TableCell align="right">{row.size.toLocaleString() + ' kB'}</TableCell>
-							<TableCell align="right">{row.status}</TableCell>
-						</TableRow>
-					))}
+					{(rows && rows.length > 0) &&
+						rows.map((row) => (
+							<TableRow key={row.start}>
+								<TableCell component="th" scope="row">
+									{row.satellite}
+								</TableCell>
+								<TableCell align="right">{row.start.toLocaleString()}</TableCell>
+								<TableCell align="right">{secondsToDuration(row.duration / 1000)}</TableCell>
+								<TableCell align="right">{row.size.toLocaleString() + ' kB'}</TableCell>
+								<TableCell align="right">{row.status}</TableCell>
+							</TableRow>
+						))
+					}
 				</TableBody>
 			</Table>
+			{(!rows || rows.length < 1) && <Typography className={classes.centerPadded}>No Passes Available</Typography>}
 		</TableContainer>
 	);
 }

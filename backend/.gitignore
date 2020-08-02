@@ -1,3 +1,5 @@
 node_modules
-*.sqlite
+
 *.db
+*.sqlite
+*.sqlite-journal

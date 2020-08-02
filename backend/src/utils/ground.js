@@ -21,6 +21,13 @@ module.exports.setGround = (longitude, latitude, elevation) =>
 		);
 	});
 
+	/**
+	 * @returns {Promise<{
+	 * longitude: number,
+	 * latitude: number,
+	 * elevation: number
+	 * }>} ground position object
+	 */
 module.exports.getGround = () =>
 	new Promise((resolve, reject) => {
 		db.get('SELECT * FROM ground WHERE rowid = 1', (e, row) => {

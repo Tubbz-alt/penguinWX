@@ -22,19 +22,21 @@ function Splash() {
 	const classes = useStyles();
 
 	useEffect(() => {
-		fetch('/api/passes')
-		.then(res => res.json())
-		.then((data) => {
-			setPasses(
-				data
-				.map(row => ({
-					...row,
-					start: new Date(row.start),
-					end: new Date(row.end)
-				}))
-			);
-		})
-		.catch(console.error);
+		if (process.env.NODE_ENV === 'production') {
+			fetch('/api/passes')
+			.then(res => res.json())
+			.then((data) => {
+				setPasses(
+					data
+					.map(row => ({
+						...row,
+						start: new Date(row.start),
+						end: new Date(row.end)
+					}))
+				);
+			})
+			.catch(console.error);
+		}
 	}, []);
 
 	let nextPass;

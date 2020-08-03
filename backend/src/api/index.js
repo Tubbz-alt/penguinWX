@@ -7,8 +7,11 @@ router.get('/', (req, res) => {
 
 router.use('/session', require('./session'));
 router.use('/password', require('./password'));
+
+router.use('/ground', require('./ground'));
+
 router.use('/passes', require('./passes'));
 router.use('/satellites', require('./satellites'));
-router.use('/ground', require('./ground'));
+router.use('/satellite', require('./satellite'));
 
 module.exports = router;

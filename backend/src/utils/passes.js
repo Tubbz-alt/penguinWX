@@ -3,9 +3,9 @@ const logger = require('./logger');
 const tle = require('./tle');
 const jspredict = require('jspredict');
 
-module.exports.addPass = passData =>
+module.exports.updatePass = passData =>
 	new Promise((resolve, reject) => {
-		const { pass_id, satellite, duration, start, end, max_elevation } = passData;
+		const { pass_id, satellite, duration, start, end, max_elevation, size, status } = passData;
 
 		db.run(
 			'\
@@ -21,8 +21,8 @@ module.exports.addPass = passData =>
 				$start: start,
 				$end: end,
 				$max_elevation: max_elevation,
-				$size: 0,
-				$status: 'scheduled',
+				$size: size ? size : 0,
+				$status: status ? status : 'scheduled',
 			},
 			e => {
 				if (e) {
@@ -35,9 +35,29 @@ module.exports.addPass = passData =>
 		);
 	});
 
-module.exports.getPasses = () =>
+/**
+ * Get an array of passes
+ * @param {string} satellite satellite to get passes of (optional)
+ * @returns {Promise<{
+ * pass_id: string,
+ * satellite: string,
+ * start: Date,
+ * duration: number,
+ * end: Date,
+ * max_elevation: number,
+ * size: number,
+ * status: string
+ * }[]>}
+ */
+module.exports.getPasses = (satellite) =>
 	new Promise((resolve, reject) => {
-		db.all('SELECT * FROM passes', (e, rows) => {
+		let statement;
+		if (satellite) {
+			statement = 'SELECT * FROM passes WHERE satellite = ?';
+		} else {
+			statement = 'SELECT * FROM passes';
+		}
+		db.all(statement, satellite ? satellite : undefined, (e, rows) => {
 			if (e) {
 				logger.error('Passes', 'Error SELECTing from `passes` table: ', e);
 				reject(e);

@@ -133,7 +133,7 @@ module.exports = () => {
 															// for each corrected pass
 															newSchedule.forEach(newPass => {
 																// add the pass into the database
-																passes.addPass(newPass).then(() => {
+																passes.updatePass(newPass).then(() => {
 																	logger.log(
 																		'Passes Loop',
 																		'Updated pass ' +

@@ -1,17 +1,19 @@
-import Splash from './Splash';
+import Passes from './Passes';
 import Satellites from './Satellites';
+import Settings from './Settings';
 
 const pages = [
 	{
-		linkName: 'Home',
-		path: '/',
-		exact: true,
-		component: Splash
+		name: 'Passes',
+		component: Passes
 	},
 	{
-		linkName: 'Satellites',
-		path: '/satellites',
+		name: 'Satellites',
 		component: Satellites
+	},
+	{
+		name: 'Settings',
+		component: Settings
 	}
 ];
 

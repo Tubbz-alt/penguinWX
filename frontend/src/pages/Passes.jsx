@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { CardHeader, CardContent } from '@material-ui/core';
 
-import TimeCard from '../../components/TimeCard';
-import CountdownCard from '../../components/CountdownCard';
-import PassTable from '../../components/PassTable';
+import TimeCard from '../components/TimeCard';
+import CountdownCard from '../components/CountdownCard';
+import PassTable from '../components/PassTable';
 
 const useStyles = makeStyles(theme => ({
 	passCard: {
@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-function Splash() {
+function Passes() {
 	const classes = useStyles();
 	const [passes, setPasses] = useState([]);
 	const [loaded, setLoaded] = useState(false);
@@ -95,4 +95,4 @@ function Splash() {
 	);
 }
 
-export default Splash;
+export default Passes;

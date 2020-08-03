@@ -28,7 +28,7 @@ module.exports.updateSatellite = (satellite, frequency, samplerate, gain, method
 				$gain: gain,
 				$method: method,
 				$minelevation: minElevation,
-				$enabled: enabled ? enabled : true
+				$enabled: typeof enabled === 'boolean' ? enabled : true
 			},
 			e => {
 				if (e) {

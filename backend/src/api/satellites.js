@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const authMiddleware = require('../middleware/auth');
 
 const logger = require('../utils/logger');
 
@@ -33,13 +34,14 @@ router.get('/:satellite', (req, res) => {
 	);
 });
 
-router.post('/:satellite', (req, res) => {
+router.post('/:satellite', authMiddleware.isAuthed, (req, res) => {
 	const satellite = req.body;
 	if (
 		satellite.satellite &&
 		satellite.frequency &&
 		satellite.sample_rate &&
 		satellite.gain &&
+		satellite.decode_method &&
 		satellite.min_elevation &&
 		typeof satellite.enabled === 'boolean'
 	) {
@@ -49,6 +51,7 @@ router.post('/:satellite', (req, res) => {
 				satellite.frequency,
 				satellite.sample_rate,
 				satellite.gain,
+				satellite.decode_method,
 				satellite.min_elevation,
 				satellite.enabled
 			)
@@ -60,10 +63,10 @@ router.post('/:satellite', (req, res) => {
 				e => {
 					logger.error(
 						'/api/satellites/:satellite',
-						'Error updating satellite' + req.params.satellite + ': ',
+						'Error updating satellite ' + req.params.satellite.green + ': ',
 						e
 					);
-					res.status(500).send('Error updating satellite' + req.params.satellite);
+					res.status(500).send('Error updating satellite ' + req.params.satellite);
 				}
 			);
 	} else {

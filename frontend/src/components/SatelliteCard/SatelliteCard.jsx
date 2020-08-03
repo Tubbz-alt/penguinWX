@@ -21,22 +21,24 @@ function SatelliteCard(props) {
 	const { satellite } = props;
 	const classes = useStyles();
 
+	const [ loading, setLoading ] = useState(false);
 	const [enabled, setEnabled] = useState(satellite.enabled);
 	useEffect(() => {
 		setEnabled(satellite.enabled);
 	}, [satellite]);
 
 	const toggleEnabled = event => {
-		setEnabled(event.target.checked);
+		const newVal = event.target.checked;
+		setLoading(true);
 		fetch('/api/satellites/' + satellite.satellite, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ ...satellite, enabled: event.target.checked }),
+			body: JSON.stringify({ ...satellite, enabled: newVal }),
 		})
 			.then(res => {
-				if (res.status !== 200) setEnabled(!event.target.checked);
-			})
-			.catch(console.error);
+				setLoading(false);
+				if (res.status === 200) setEnabled(newVal);
+			});
 	};
 
 	const tableData = [
@@ -66,7 +68,7 @@ function SatelliteCard(props) {
 
 	return (
 		<Card className={classes.card}>
-			<CardHeader action={<Switch checked={enabled} onChange={toggleEnabled} />} title={satellite.satellite} />
+			<CardHeader action={<Switch disabled={loading} checked={enabled} onChange={toggleEnabled} />} title={satellite.satellite} />
 			<CardContent>
 				<TableContainer>
 					<Table>

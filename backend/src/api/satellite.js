@@ -56,29 +56,34 @@ router.post('/:satellite', authMiddleware.isAuthed, (req, res) => {
 										(pass.status === 'scheduled' || pass.status === 'canceled')
 								)
 								.forEach(pass => {
-									passes.updatePass({
-										...pass,
-										status: satellite.enabled ? 'scheduled' : 'canceled',
-									}).then(() => {
-										if (!satellite.enabled) {
-											scheduler.cancel(pass.pass_id);
-											logger.warn(
-												'/api/satellite/:satellite',
-												'Canceled pass ' + pass.pass_id.green
-											);
-										} else {
-											logger.log(
-												'/api/satellite/:satellite',
-												'Updated pass ' + pass.pass_id.green
-											);
-										}
-									}, e => {
-										logger.error(
-											'/api/satellite/:satellite',
-											'Error updating pass ' + pass.pass_id.green,
-											e
+									passes
+										.updatePass({
+											...pass,
+											status: satellite.enabled ? 'scheduled' : 'canceled',
+										})
+										.then(
+											() => {
+												if (!satellite.enabled) {
+													scheduler.cancel(pass.pass_id);
+													logger.warn(
+														'/api/satellite/:satellite',
+														'Canceled pass ' + pass.pass_id.green
+													);
+												} else {
+													logger.log(
+														'/api/satellite/:satellite',
+														'Updated pass ' + pass.pass_id.green
+													);
+												}
+											},
+											e => {
+												logger.error(
+													'/api/satellite/:satellite',
+													'Error updating pass ' + pass.pass_id.green,
+													e
+												);
+											}
 										);
-									});
 								});
 						},
 						e => {
@@ -110,6 +115,38 @@ router.post('/:satellite', authMiddleware.isAuthed, (req, res) => {
 			'Invalid satellite object. Expected {satellite: string, frequency: number, sample_rate: number, gain: number, min_elevation: number, enabled: boolean}'
 		);
 	}
+});
+
+router.get('/:satellite/passes', (req, res) => {
+	satellites.getSatellite(req.params.satellite).then(
+		row => {
+			if (row) {
+				passes.getPasses(req.params.satellite).then(
+					rows => {
+						res.status(200).json(rows);
+					},
+					e => {
+						logger.error(
+							'/api/satellite/:satellite/passes',
+							'Error getting passes for ' + req.params.satellite.green + ': ',
+							e
+						);
+						res.status(500).send('Error getting passes');
+					}
+				);
+			} else {
+				res.status(404).send('Satellite ' + req.params.satellite + ' not found!');
+			}
+		},
+		e => {
+			logger.error(
+				'/api/satellite/:satellite/passes',
+				'Error checking satellite' + req.params.satellite + ': ',
+				e
+			);
+			res.status(500).send('Error checking satellite' + req.params.satellite);
+		}
+	);
 });
 
 module.exports = router;

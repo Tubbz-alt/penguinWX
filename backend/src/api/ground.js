@@ -5,7 +5,7 @@ const logger = require('../utils/logger');
 
 const ground = require('../utils/ground');
 
-router.get('/', (req, res) => {
+router.get('/', authMiddleware.isAuthed, (req, res) => {
 	ground.getGround().then(
 		groundPosition => {
 			if (groundPosition) {

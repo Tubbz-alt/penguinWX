@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import usePreciseTimer from '../hooks/usePreciseTimer';
 
 import { makeStyles } from '@material-ui/core/styles';
-import { Card, CardHeader, CardContent, Typography } from '@material-ui/core';
+import { Card, CardHeader, CardContent, Typography, CircularProgress } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
 	card: {
@@ -29,12 +29,20 @@ const msToDuration = _ms => {
 };
 
 function CountdownCard(props) {
-	const {title, endDate} = props;
+	const {title, endDate, loading} = props;
 
 	const [ currentDate, setDate ] = useState(new Date());
 	usePreciseTimer(() => setDate(new Date()), 1000, endDate && endDate > currentDate);
 
 	const classes = useStyles();
+
+	if (loading) return (
+		<Card className={classes.card}>
+			<CardContent style={{height: '100%'}} className={classes.cardContent}>
+				<CircularProgress size={70} />
+			</CardContent>
+		</Card>
+	);
 
 	return (
 		<Card className={classes.card}>

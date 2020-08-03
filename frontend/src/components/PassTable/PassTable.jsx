@@ -11,6 +11,7 @@ import {
 	TableFooter,
 	TablePagination,
 	Typography,
+	LinearProgress,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -33,7 +34,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function PassTable(props) {
-	const { rows } = props;
+	const { rows, loading } = props;
 	const classes = useStyles();
 
 	const [page, setPage] = useState(0);
@@ -83,7 +84,7 @@ function PassTable(props) {
 							)
 						)}
 				</TableBody>
-				{(rows && rows.length > 0) && (
+				{rows && rows.length > 0 && (
 					<TableFooter>
 						<TableRow>
 							<TablePagination
@@ -102,7 +103,8 @@ function PassTable(props) {
 					</TableFooter>
 				)}
 			</Table>
-			{(!rows || rows.length < 1) && (
+			{loading && <LinearProgress style={{margin: '20px'}} variant="query" />}
+			{!loading && (!rows || rows.length < 1) && (
 				<Typography className={classes.centerPadded}>No Passes Available</Typography>
 			)}
 		</TableContainer>

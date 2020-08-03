@@ -11,15 +11,16 @@ const port = 8080;
 require('./src/utils/database');
 
 require('./src/utils/ground.js').setGround(0,0,0);
-require('./src/utils/satellites').addSatellite('NOAA 18', 137912500, 55000, 40, 'noaa', 19);
-require('./src/utils/satellites').addSatellite('NOAA 15', 137620000, 55000, 40, 'noaa', 19);
-require('./src/utils/satellites').addSatellite('NOAA 19', 137100000, 55000, 40, 'noaa', 19);
-require('./src/utils/satellites').addSatellite('METEOR-M 2', 137100000, 150000, 50, 'meteor', 19);
+require('./src/utils/satellites').updateSatellite('NOAA 18', 137912500, 55000, 40, 'noaa', 19);
+require('./src/utils/satellites').updateSatellite('NOAA 15', 137620000, 55000, 40, 'noaa', 19);
+require('./src/utils/satellites').updateSatellite('NOAA 19', 137100000, 55000, 40, 'noaa', 19);
+require('./src/utils/satellites').updateSatellite('METEOR-M 2', 137100000, 150000, 50, 'meteor', 19);
 
 // start up the express server
 const app = express();
-// JSON parsing middleware
+// JSON parsing and compression middlewares
 app.use(express.json());
+app.use(require('compression')());
 // api route handlers
 app.use('/api', apiRoutes);
 app.use('/', express.static('../frontend/build'));

@@ -51,7 +51,8 @@ db.serialize(() => {
 			sample_rate INT NOT NULL,\
 			gain INT NOT NULL,\
 			decode_method TEXT NOT NULL,\
-			min_elevation FLOAT\
+			min_elevation FLOAT,\
+			enabled BOOLEAN DEFAULT 1\
 		)',
 		e => {
 			if (e) {

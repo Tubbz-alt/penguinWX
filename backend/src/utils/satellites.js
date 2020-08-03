@@ -5,20 +5,22 @@ const jspredict = require('jspredict');
 const logger = require('./logger');
 
 /**
- * Add a new satellite to the database
+ * Add a new satellite or update an existing satellite into the database
  * @param {string} satellite satellite name (TLE format)
  * @param {number} frequency recording frequency (Hz)
  * @param {number} samplerate recording samplerate (Hz)
  * @param {number} gain gain (dBi)
  * @param {string} method satellite type ("noaa" or "meteor")
+ * @param {number} minElevation minimum elevation for passes
+ * @param {boolean} enabled is the satellite enabled for passes
  */
-module.exports.addSatellite = (satellite, frequency, samplerate, gain, method, minElevation) =>
+module.exports.updateSatellite = (satellite, frequency, samplerate, gain, method, minElevation, enabled) =>
 	new Promise((resolve, reject) => {
 		db.run(
 			'INSERT or REPLACE INTO satellites\
-		(satellite, frequency, sample_rate, gain, decode_method, min_elevation)\
+		(satellite, frequency, sample_rate, gain, decode_method, min_elevation, enabled)\
 		VALUES\
-		($satellite, $frequency, $samplerate, $gain, $method, $minelevation)',
+		($satellite, $frequency, $samplerate, $gain, $method, $minelevation, $enabled)',
 			{
 				$satellite: satellite,
 				$frequency: frequency,
@@ -26,6 +28,7 @@ module.exports.addSatellite = (satellite, frequency, samplerate, gain, method, m
 				$gain: gain,
 				$method: method,
 				$minelevation: minElevation,
+				$enabled: enabled ? enabled : true
 			},
 			e => {
 				if (e) {
@@ -55,7 +58,7 @@ module.exports.getSatellites = () =>
 				logger.error('Satellites', 'Error SELECTing from `satellites` table: ', e);
 				reject(e);
 			} else {
-				resolve(rows);
+				resolve(rows.map(row => ({ ...row, enabled: (row.enabled === 1 ? true : false) })));
 			}
 		});
 	});
@@ -63,15 +66,26 @@ module.exports.getSatellites = () =>
 /**
  * Get a single satellite from the database
  * @param {string} satellite satellite name (TLE format)
+ * @returns {Promise<{
+ * satellite: string,
+ * frequency: number,
+ * sample_rate: number,
+ * gain: number,
+ * decode_method: string
+ * }>} satellite object
  */
 module.exports.getSatellite = satellite =>
 	new Promise((resolve, reject) => {
-		db.all(`SELECT * FROM satellites WHERE satellite = ?`, satellite, (e, row) => {
+		db.get(`SELECT * FROM satellites WHERE satellite = ?`, satellite, (e, row) => {
 			if (e) {
 				logger.error('Satellites', 'Error SELECTing from `satellites` table: ', e);
 				reject(e);
 			} else {
-				resolve(row);
+				if (row) {
+					resolve({ ...row, enabled: (row.enabled === 1 ? true : false) });
+				} else {
+					resolve(null);
+				}
 			}
 		});
 	});

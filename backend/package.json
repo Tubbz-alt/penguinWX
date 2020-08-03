@@ -19,6 +19,7 @@
 	"homepage": "https://github.com/PenguinSnail/penguinWX#readme",
 	"dependencies": {
 		"colors": "^1.4.0",
+		"compression": "^1.7.4",
 		"express": "^4.17.1",
 		"jsonwebtoken": "^8.5.1",
 		"jspredict": "^1.1.1",

@@ -37,12 +37,12 @@ function PassTable(props) {
 	const classes = useStyles();
 
 	const [page, setPage] = useState(0);
-	const [rowsPerPage, setRowsPerPage] = useState(rows.length < 25 ? -1 : 10);
+	const [rowsPerPage, setRowsPerPage] = useState(rows.length < 25 ? rows.length : 10);
 	//const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
 	useEffect(() => {
 		setPage(0);
-		setRowsPerPage(rows.length < 25 ? -1 : 10);
+		setRowsPerPage(rows.length < 25 ? rows.length : 10);
 	}, [rows]);
 
 	const handleChangePage = (event, newPage) => {
@@ -50,7 +50,7 @@ function PassTable(props) {
 	};
 
 	const handleChangeRowsPerPage = event => {
-		setRowsPerPage(parseInt(event.target.value, rows.length < 25 ? -1 : 10));
+		setRowsPerPage(parseInt(event.target.value, rows.length < 25 ? rows.length : 10));
 		setPage(0);
 	};
 
@@ -83,22 +83,24 @@ function PassTable(props) {
 							)
 						)}
 				</TableBody>
-				<TableFooter>
-					<TableRow>
-						<TablePagination
-							rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-							count={rows.length}
-							rowsPerPage={rowsPerPage}
-							page={page}
-							SelectProps={{
-								inputProps: { 'aria-label': 'rows per page' },
-								//native: true,
-							}}
-							onChangePage={handleChangePage}
-							onChangeRowsPerPage={handleChangeRowsPerPage}
-						/>
-					</TableRow>
-				</TableFooter>
+				{(rows && rows.length > 0) && (
+					<TableFooter>
+						<TableRow>
+							<TablePagination
+								rowsPerPageOptions={[5, 10, 25, { label: 'All', value: rows.length }]}
+								count={rows.length}
+								rowsPerPage={rowsPerPage}
+								page={page}
+								SelectProps={{
+									inputProps: { 'aria-label': 'rows per page' },
+									//native: true,
+								}}
+								onChangePage={handleChangePage}
+								onChangeRowsPerPage={handleChangeRowsPerPage}
+							/>
+						</TableRow>
+					</TableFooter>
+				)}
 			</Table>
 			{(!rows || rows.length < 1) && (
 				<Typography className={classes.centerPadded}>No Passes Available</Typography>

@@ -1,10 +1,12 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { makeStyles } from '@material-ui/core/styles';
 import AuthContext from '../../contexts/AuthContext';
 
 import { Card, CardHeader, CardContent, CardActions } from '@material-ui/core';
 import { TextField, Button } from '@material-ui/core';
+
+import Notification from '../../components/Notification';
 
 const useStyles = makeStyles(theme => ({
 	card: {
@@ -21,6 +23,11 @@ const useStyles = makeStyles(theme => ({
 function Ground() {
 	const classes = useStyles();
 	const {auth} = useContext(AuthContext);
+
+	const [notificationState, setNotificationState] = useState({ open: false, message: '', variant: 'info' });
+	const closeNotification = () => {
+		setNotificationState({ ...notificationState, open: false });
+	};
 
 	const {
 		register,
@@ -69,9 +76,19 @@ function Ground() {
 			if (res.status > 199 && res.status < 300) {
 				reset(newGround);
 				trigger();
+				setNotificationState({
+					open: true,
+					message: 'Updated ground position',
+					variant: 'success',
+				});
 			} else {
 				reset();
 				trigger();
+				setNotificationState({
+					open: true,
+					message: 'Failed to update ground position',
+					variant: 'error',
+				});
 			}
 		});
 	};
@@ -125,6 +142,12 @@ function Ground() {
 					</Button>
 				</CardActions>
 			</form>
+			<Notification
+				open={notificationState.open}
+				variant={notificationState.variant}
+				message={notificationState.message}
+				onClose={closeNotification}
+			/>
 		</Card>
 	);
 }

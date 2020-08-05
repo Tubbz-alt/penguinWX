@@ -7,6 +7,8 @@ import { Card, CardHeader, CardContent, CardActions } from '@material-ui/core';
 import { FormControl, InputLabel, Input, InputAdornment, IconButton, FormHelperText, Button } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 
+import Notification from '../../components/Notification';
+
 const useStyles = makeStyles(theme => ({
 	card: {
 		margin: '15px',
@@ -19,11 +21,16 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-function Ground() {
+function AuthComponent() {
 	const classes = useStyles();
 	const { auth, updateAllAuth, setToken } = useContext(AuthContext);
-	
+
 	const [showPassword, setShowPassword] = useState(false);
+
+	const [notificationState, setNotificationState] = useState({ open: false, message: '', variant: 'info' });
+	const closeNotification = () => {
+		setNotificationState({ ...notificationState, open: false });
+	};
 
 	const {
 		register,
@@ -46,6 +53,17 @@ function Ground() {
 					setToken(newToken);
 					updateAllAuth();
 					reset({ password: '' });
+				});
+				setNotificationState({
+					open: true,
+					message: 'Set new password',
+					variant: 'success',
+				});
+			} else {
+				setNotificationState({
+					open: true,
+					message: 'Failed to set new password',
+					variant: 'error',
 				});
 			}
 		});
@@ -100,8 +118,14 @@ function Ground() {
 					</Button>
 				</CardActions>
 			</form>
+			<Notification
+				open={notificationState.open}
+				variant={notificationState.variant}
+				message={notificationState.message}
+				onClose={closeNotification}
+			/>
 		</Card>
 	);
 }
 
-export default Ground;
+export default AuthComponent;

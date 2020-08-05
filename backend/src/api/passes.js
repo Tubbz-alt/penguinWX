@@ -29,9 +29,10 @@ router.put('/action', authMiddleware.isAuthed, (req, res) => {
 					for (let i = 0; i <= deletedPasses.length; i++) {
 						if (i < deletedPasses.length) {
 							scheduler.cancel(deletedPasses[i]);
+						} else {
+							res.status(200).json(deletedPasses);
 						}
 					}
-					res.status(202).json(deletedPasses);
 				},
 				e => {
 					logger.error('/api/passes/action', 'Error deleting scheduled passes: ', e);

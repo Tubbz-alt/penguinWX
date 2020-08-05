@@ -71,6 +71,27 @@ module.exports.getPasses = (satellite) =>
 		});
 	});
 
+module.exports.deleteScheduledPasses = () => new Promise((resolve, reject) => {
+	const selectStatement = 'SELECT * FROM passes WHERE status = "scheduled"';
+	const deleteStatement = 'DELETE FROM passes WHERE status = "scheduled"';
+	db.all(selectStatement, (e, rows) => {
+		if (e) {
+			logger.error('Passes', 'Error SELECTing scheduled passes from `passes` table: ', e);
+			reject(e);
+		} else {
+			db.run(deleteStatement, e => {
+				if (e) {
+					logger.error('Passes', 'Error DELETEing scheduled passes from `passes` table: ', e);
+					reject(e);
+				} else {
+					rows.forEach(row => logger.warn('Passes', 'DELETE'.red + 'ing scheduled pass ' + row.pass_id.green + '!'));
+					resolve(rows.map(row => row.pass_id));
+				}
+			});
+		}
+	});
+});
+
 module.exports.updateStatus = (passId, status, size) =>
 	new Promise((resolve, reject) => {
 		db.run(

@@ -13,7 +13,8 @@ const pages = [
 	},
 	{
 		name: 'Settings',
-		component: Settings
+		component: Settings,
+		authed: true
 	}
 ];
 

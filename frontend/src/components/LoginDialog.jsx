@@ -1,28 +1,26 @@
 import React, { useState, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { makeStyles } from '@material-ui/core/styles';
-import AuthContext from '../../contexts/AuthContext';
+import AuthContext from '../contexts/AuthContext';
 
-import { Card, CardHeader, CardContent, CardActions } from '@material-ui/core';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@material-ui/core';
 import { FormControl, InputLabel, Input, InputAdornment, IconButton, FormHelperText, Button } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 
 const useStyles = makeStyles(theme => ({
-	card: {
-		margin: '15px',
-		width: '100%',
-		maxWidth: '350px',
+	spacer: {
+		flexGrow: 1,
 	},
-	spacer: { flexGrow: 1 },
 	input: {
-		marginBottom: 15,
+		marginBottom: '15px',
 	},
 }));
 
-function Ground() {
+function LoginDialog(props) {
 	const classes = useStyles();
-	const { auth, updateAllAuth, setToken } = useContext(AuthContext);
-	
+	const { onClose, open } = props;
+	const {auth, updateAllAuth, setToken} = useContext(AuthContext);
+
 	const [showPassword, setShowPassword] = useState(false);
 
 	const {
@@ -36,7 +34,7 @@ function Ground() {
 	});
 
 	const onSubmit = data => {
-		fetch('/api/password', {
+		fetch('/api/session', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json', 'auth-jwt': auth.token },
 			body: JSON.stringify(data),
@@ -45,10 +43,16 @@ function Ground() {
 				res.json().then(newToken => {
 					setToken(newToken);
 					updateAllAuth();
-					reset({ password: '' });
+					handleClose();
 				});
 			}
 		});
+	};
+
+	const handleClose = () => {
+		reset();
+		setShowPassword(false);
+		onClose();
 	};
 
 	const handleClickShowPassword = () => {
@@ -60,10 +64,10 @@ function Ground() {
 	};
 
 	return (
-		<Card className={classes.card}>
-			<CardHeader title="Authentication" />
+		<Dialog onClose={onClose} open={open} fullWidth maxWidth="xs">
+			<DialogTitle>Login</DialogTitle>
 			<form onSubmit={handleSubmit(onSubmit)}>
-				<CardContent>
+				<DialogContent>
 					<FormControl fullWidth className={classes.input} error={Boolean(errors.password)}>
 						<InputLabel htmlFor="standard-adornment-password">Password</InputLabel>
 						<Input
@@ -81,27 +85,19 @@ function Ground() {
 						/>
 						{errors.password && <FormHelperText>Password is required!</FormHelperText>}
 					</FormControl>
-				</CardContent>
-				<CardActions>
+				</DialogContent>
+				<DialogActions>
 					<span className={classes.spacer} />
-					<Button
-						variant="contained"
-						color="secondary"
-						disabled={!auth.requiresAuth}
-						onClick={() => {
-							localStorage.removeItem('token');
-							window.location.reload();
-						}}
-					>
-						Logout
+					<Button variant="contained" onClick={handleClose}>
+						Cancel
 					</Button>
 					<Button variant="contained" color="primary" type="submit" disabled={!isDirty || !isValid}>
-						Set Password
+						Login
 					</Button>
-				</CardActions>
+				</DialogActions>
 			</form>
-		</Card>
+		</Dialog>
 	);
 }
 
-export default Ground;
+export default LoginDialog;

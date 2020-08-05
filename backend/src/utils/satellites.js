@@ -102,7 +102,7 @@ module.exports.getSatellite = satellite =>
  */
 module.exports.generatePasses = (satellite, minElevation, startDate, endDate, longitude, latitude, elevation) =>
 	new Promise((resolve, reject) => {
-		const qth = [longitude, latitude, elevation];
+		const qth = [latitude, longitude, elevation];
 		tle.getTLE(satellite).then(
 			satTLE => {
 				if (satTLE) {

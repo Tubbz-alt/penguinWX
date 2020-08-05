@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useEffect, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import AuthContext from '../contexts/AuthContext';
 
 import { Card, CardHeader, CardContent } from '@material-ui/core';
 import { TableContainer, Table, TableBody, TableRow, TableCell } from '@material-ui/core';
@@ -19,8 +19,10 @@ function SatelliteCard(props) {
 	const { satellite } = props;
 	const classes = useStyles();
 
-	const [ loading, setLoading ] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const [enabled, setEnabled] = useState(satellite.enabled);
+	const {auth} = useContext(AuthContext);
+
 	useEffect(() => {
 		setEnabled(satellite.enabled);
 	}, [satellite]);
@@ -30,13 +32,12 @@ function SatelliteCard(props) {
 		setLoading(true);
 		fetch('/api/satellite/' + satellite.satellite, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json', 'auth-jwt': auth.token },
 			body: JSON.stringify({ ...satellite, enabled: newVal }),
-		})
-			.then(res => {
-				setLoading(false);
-				if (res.status > 199 && res.status < 300) setEnabled(newVal);
-			});
+		}).then(res => {
+			setLoading(false);
+			if (res.status > 199 && res.status < 300) setEnabled(newVal);
+		});
 	};
 
 	const tableData = [
@@ -66,7 +67,16 @@ function SatelliteCard(props) {
 
 	return (
 		<Card className={classes.card}>
-			<CardHeader action={<Switch disabled={loading} checked={enabled} onChange={toggleEnabled} />} title={satellite.satellite} />
+			<CardHeader
+				action={
+					!auth.requiresAuth || auth.token ? (
+						<Switch disabled={loading} checked={enabled} onChange={toggleEnabled} />
+					) : (
+						''
+					)
+				}
+				title={satellite.satellite}
+			/>
 			<CardContent>
 				<TableContainer>
 					<Table>

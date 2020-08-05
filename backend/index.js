@@ -11,9 +11,6 @@ const port = 8080;
 require('./src/utils/database');
 
 const satellites = require('./src/utils/satellites');
-
-require('./src/utils/ground').setGround(0,0,0);
-
 satellites.getSatellite('NOAA 18').then(sat => {
 	if (sat === null) satellites.updateSatellite('NOAA 18', 137912500, 55000, 40, 'noaa', 19);
 }, e => {
@@ -51,10 +48,10 @@ require('./src/utils/tle')
 	.then(
 		() => {
 			logger.log('TLE', 'Updated TLE database');
-			require('./src/loop')();
+			require('./src/loop').startLoops();
 		},
 		e => {
 			logger.error('TLE', 'Error updating TLEs: ', e);
-			require('./src/loop')();
+			require('./src/loop').startLoops();
 		}
 	);

@@ -12,7 +12,7 @@ router.post('/', authMiddleware.isAuthed, (req, res) => {
 			if (req.body.password !== '') {
 				authUtils.setAuth(req.body.password).then(
 					({ token }) => {
-						res.status(200).send(token);
+						res.status(200).json(token);
 					},
 					e => {
 						logger.error('/api/password', 'Error storing new authentication: ', e);

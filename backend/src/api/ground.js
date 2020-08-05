@@ -4,6 +4,7 @@ const authMiddleware = require('../middleware/auth');
 const logger = require('../utils/logger');
 
 const ground = require('../utils/ground');
+const passes = require('../utils/passes');
 
 router.get('/', authMiddleware.isAuthed, (req, res) => {
 	ground.getGround().then(
@@ -28,6 +29,9 @@ router.post('/', authMiddleware.isAuthed, (req, res) => {
 				if (req.body.elevation && typeof req.body.elevation === 'number') {
 					ground.setGround(req.body.longitude, req.body.latitude, req.body.elevation).then(
 						() => {
+							passes.deleteScheduledPasses().then(() => {
+								require('../loop').generatePasses();
+							});
 							res.status(200).json({
 								longitude: req.body.longitude,
 								latitude: req.body.latitude,

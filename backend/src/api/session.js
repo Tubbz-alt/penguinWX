@@ -5,6 +5,24 @@ const logger = require('../utils/logger');
 
 const authUtils = require('../utils/auth');
 
+router.get('/', (req, res) => {
+	authUtils.getAuth().then(
+		auth => {
+			// if no salt/hash is defined
+			if (!auth) {
+				res.status(200).json(false);
+			}  else {
+				// else fail if no token is given
+				res.status(200).json(true);
+			}
+		},
+		e => {
+			// handle read errors
+			logger.error('/api/session', 'Error checking auth in db: ', e);
+		}
+	);
+});
+
 router.post('/', (req, res) => {
 	if (req.body) {
 		if (req.body.password && typeof req.body.password === 'string') {
@@ -13,7 +31,7 @@ router.post('/', (req, res) => {
 					auth => {
 						const valid = authUtils.verifyPassword(req.body.password, auth.salt, auth.hash);
 						if (valid) {
-							res.status(200).send(auth.token);
+							res.status(200).json(auth.token);
 						} else {
 							res.status(401).send('Invalid password!');
 						}
